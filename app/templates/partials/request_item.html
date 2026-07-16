@@ -1,0 +1,5 @@
+<article class="request-item">
+  {% if item.media.poster_path %}<img class="request-poster" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">{% else %}<div class="request-poster-placeholder">无海报</div>{% endif %}
+  <div class="request-body"><div class="request-title-row"><div class="request-title">{{ item.media.title }}</div><span class="pill pill-{{ item.request_type }}">{{ type_labels[item.request_type] }}</span></div><div class="request-meta">{{ item.media.release_year or '年份未知' }} · {{ '电影' if item.media.media_type == 'movie' else '剧集' }}</div>{% if item.user_note %}<div class="request-note"><b>我的备注：</b>{{ item.user_note }}</div>{% endif %}{% if item.admin_note %}<div class="request-note admin-note"><b>处理备注：</b>{{ item.admin_note }}</div>{% endif %}</div>
+  <div class="request-footer"><span class="pill pill-{{ item.status }}">{{ status_labels[item.status] }}</span><time class="request-time">{{ item.updated_at.strftime('%Y-%m-%d %H:%M') }}</time></div>
+</article>

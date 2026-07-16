@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="topbar-label">TMDB 检索</div>
+<div class="topbar-title">资源搜索</div>
+<div class="topbar-sub">搜索电影和剧集，确认 Emby 片库状态。</div>
+{% endblock %}
+{% block content %}
+<section class="search-section"><h1>搜索电影和剧集</h1><p>系统根据 Emby 同步结果标记入库状态。</p><form class="search-bar" method="get" action="/search"><input class="search-input" name="q" value="{{ query }}" autofocus placeholder="例如：流浪地球、The Last of Us" aria-label="搜索片名"><button class="btn btn-primary" type="submit">搜索</button></form></section>
+{% if error %}<div class="notice notice-error">{{ error }}</div>{% endif %}
+{% if query and not results and not error %}<div class="empty-state"><p>没有找到匹配的电影或剧集。</p></div>{% endif %}
+<div class="media-grid">{% for item in results %}
+  <article class="media-card">
+    {% if item.poster_path %}<img class="media-poster" src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}" alt="{{ item.title }} 海报" loading="lazy">{% else %}<div class="poster-placeholder">无海报</div>{% endif %}
+    <div class="media-content"><div class="media-title-row"><div class="media-title">{{ item.title }}</div><span class="pill pill-request">{{ '电影' if item.media_type == 'movie' else '剧集' }}</span></div>
+      <div class="media-meta">{{ item.year or '年份未知' }}{% if item.original_title and item.original_title != item.title %} · {{ item.original_title }}{% endif %}</div><p class="media-overview">{{ item.overview }}</p>
+
+      {# ── Movie already in Emby: hide all action buttons ── #}
+      {% if item.is_in_emby and item.media_type == 'movie' %}
+        <div class="library-status in-library">✓ Emby 库内已有</div>
+
+      {# ── TV show already in Emby: only 追新 ── #}
+      {% elif item.is_in_emby and item.media_type == 'tv' %}
+        <div class="library-status in-library">✓ 已入库</div>
+        <div class="request-form">
+          <span class="pending-label">告诉管理员想继续观看哪一季</span>
+          <button class="btn btn-primary" type="button" data-dialog-open="follow-{{ loop.index }}">追新</button>
+        </div>
+        <dialog class="follow-dialog" id="follow-{{ loop.index }}" aria-labelledby="follow-title-{{ loop.index }}">
+          <div class="dialog-head"><div><span class="eyebrow">追新申请</span><h2 id="follow-title-{{ loop.index }}">{{ item.title }}</h2></div><button class="dialog-close" type="button" data-dialog-close aria-label="关闭">×</button></div>
+          <p>请填写需要观看的第几季；管理员会据此核实片库更新情况。</p>
+          <form action="/requests/create" method="post" class="follow-request-form">
+          <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+          <input type="hidden" name="tmdb_id" value="{{ item.tmdb_id }}">
+          <input type="hidden" name="media_type" value="{{ item.media_type }}">
+          <input type="hidden" name="title" value="{{ item.title }}">
+          <input type="hidden" name="original_title" value="{{ item.original_title or '' }}">
+          <input type="hidden" name="year" value="{{ item.year or '' }}">
+          <input type="hidden" name="overview" value="{{ item.overview }}">
+          <input type="hidden" name="poster_path" value="{{ item.poster_path or '' }}">
+          <input type="hidden" name="request_type" value="follow">
+            <label>想看的第几季<input name="season_number" type="number" min="1" step="1" required placeholder="例如：第 2 季"></label>
+            <label>补充说明 <span class="optional">（可选）</span><textarea name="user_note" rows="3" maxlength="500" placeholder="例如：已看完上一季，想继续追更新"></textarea></label>
+            <div class="dialog-actions"><button class="btn btn-secondary" type="button" data-dialog-close>取消</button><button class="btn btn-primary" type="submit">提交追新申请</button></div>
+          </form>
+        </dialog>
+
+      {# ── TV show NOT in Emby: 求片 + show missing seasons ── #}
+      {% elif not item.is_in_emby and item.media_type == 'tv' %}
+        {% if item.tmdb_seasons %}
+        <div class="tv-seasons-label">需要求的第 {% for s in item.tmdb_seasons %}<span class="season-badge season-missing">{{ s }}</span>{% endfor %} 季</div>
+        {% endif %}
+        <form action="/requests/create" method="post" class="request-form">
+          <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+          <input type="hidden" name="tmdb_id" value="{{ item.tmdb_id }}">
+          <input type="hidden" name="media_type" value="{{ item.media_type }}">
+          <input type="hidden" name="title" value="{{ item.title }}">
+          <input type="hidden" name="original_title" value="{{ item.original_title or '' }}">
+          <input type="hidden" name="year" value="{{ item.year or '' }}">
+          <input type="hidden" name="overview" value="{{ item.overview }}">
+          <input type="hidden" name="poster_path" value="{{ item.poster_path or '' }}">
+          <input type="hidden" name="request_type" value="request">
+          <button class="btn btn-primary" type="submit">求片</button>
+        </form>
+
+      {# ── Movie NOT in Emby: 求片 ── #}
+      {% else %}
+        <form action="/requests/create" method="post" class="request-form">
+          <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+          <input type="hidden" name="tmdb_id" value="{{ item.tmdb_id }}">
+          <input type="hidden" name="media_type" value="{{ item.media_type }}">
+          <input type="hidden" name="title" value="{{ item.title }}">
+          <input type="hidden" name="original_title" value="{{ item.original_title or '' }}">
+          <input type="hidden" name="year" value="{{ item.year or '' }}">
+          <input type="hidden" name="overview" value="{{ item.overview }}">
+          <input type="hidden" name="poster_path" value="{{ item.poster_path or '' }}">
+          <input type="hidden" name="request_type" value="request">
+          <button class="btn btn-primary" type="submit">求片</button>
+        </form>
+      {% endif %}
+    </div>
+  </article>{% endfor %}
+</div>
+{% endblock %}

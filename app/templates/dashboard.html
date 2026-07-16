@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="topbar-label">Overview</div>
+<div class="topbar-title">工作台</div>
+<div class="topbar-sub">掌握搜索、求片和服务状态。</div>
+{% endblock %}
+{% block content %}
+<section class="hero"><div><span class="eyebrow">欢迎回来，{{ current_user.username }}</span><h1>{% if current_user.is_admin %}申请动态，一眼掌握。{% else %}想看的内容，交给我们处理。{% endif %}</h1><p>{% if current_user.is_admin %}这里展示所有用户最近提交的申请，可直接调整处理状态并进入处理中心查看详情。{% else %}从 TMDB 搜索电影或剧集，确认 Emby 片库状态后提交求片或追新申请。{% endif %}</p></div><a class="button button-primary" href="{{ '/admin/requests' if current_user.is_admin else '/search' }}">{{ '进入处理中心' if current_user.is_admin else '搜索内容' }}</a></section>
+{% if stats %}
+<section class="stats-grid">
+  <div class="stat-card"><div class="stat-label">Emby 电影</div><div class="stat-value">{{ stats.movie_count if stats.movie_count is not none else '—' }}</div></div>
+  <div class="stat-card"><div class="stat-label">Emby 剧集</div><div class="stat-value">{{ stats.tv_count if stats.tv_count is not none else '—' }}</div></div>
+  <div class="stat-card highlight"><div class="stat-label">待处理申请</div><div class="stat-value">{{ stats.pending_count }}</div></div>
+  <div class="stat-card"><div class="stat-label">已入库</div><div class="stat-value">{{ stats.completed_count }}</div></div>
+</section>
+{% endif %}
+{% if current_user.is_admin and sync_status is not none %}
+<section class="panels">
+  <section class="panel">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <div class="panel-label">服务状态</div>
+        <div class="panel-title">在线情况</div>
+      </div>
+    </div>
+    <div class="service-list">
+      <div class="service-item"><span class="dot {{ 'on' if configured.emby_url and configured.emby_api_key else 'off' }}"></span>Emby 服务{% if configured.emby_url and configured.emby_api_key %}：已配置{% else %}：未配置{% endif %}</div>
+      <div class="service-item"><span class="dot {{ 'on' if configured.tmdb_api_key else 'off' }}"></span>TMDB 数据库{% if configured.tmdb_api_key %}：已配置{% else %}：未配置{% endif %}</div>
+      <div class="service-item"><span class="dot {{ 'on' if configured.telegram_bot_token and configured.telegram_chat_id else 'off' }}"></span>Telegram 通知{% if configured.telegram_bot_token and configured.telegram_chat_id %}：已配置{% else %}：未配置{% endif %}</div>
+    </div>
+  </section>
+  <section class="panel sync-panel">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <div class="panel-label">Emby 片库</div>
+        <div class="panel-title">同步进度</div>
+      </div>
+      <div class="sync-library-counts"><span>电影 <b>{{ sync_status.movie_count if sync_status.movie_count is not none else '—' }}</b></span><span>剧集 <b>{{ sync_status.tv_count if sync_status.tv_count is not none else '—' }}</b></span></div>
+    </div>
+    {% if sync_status.next_sync_at %}
+    <div class="sync-status"><div><span class="sync-dot"></span><strong>自动同步已开启</strong></div><span>距下次同步 <b id="sync-countdown" data-next-sync="{{ sync_status.next_sync_at.isoformat() }}">计算中…</b></span></div>
+    <div class="sync-details">{% if sync_status.last_sync_at %}<div><span>上次同步</span><strong>{{ sync_status.last_sync_at.strftime('%Y-%m-%d %H:%M') }} 北京时间</strong></div>{% endif %}<div><span>同步间隔</span><strong>30 分钟</strong></div><div><span>下次同步</span><strong>{{ sync_status.next_sync_at.strftime('%Y-%m-%d %H:%M') }} 北京时间</strong></div></div>
+    {% else %}
+    <div class="sync-status sync-status-pending"><div><span class="sync-dot"></span><strong>等待首次手动同步</strong></div><span>完成后将自动开始 30 分钟同步周期</span></div>
+    {% endif %}
+  </section>
+</section>
+{% endif %}
+{% if current_user.is_admin %}
+<section class="section-heading"><div><span class="eyebrow">管理员收件箱</span><h2>最新用户申请</h2></div><a href="/admin/requests">查看全部</a></section>
+{% if requests %}<div class="request-list admin-dashboard-list">{% for item in requests %}
+<article class="request-item">
+  {% if item.media.poster_path %}<img class="request-poster" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">{% else %}<div class="request-poster-placeholder">无海报</div>{% endif %}
+  <div class="request-body"><div class="request-title-row"><div class="request-title">{{ item.media.title }}</div><span class="pill pill-{{ item.request_type }}">{{ type_labels[item.request_type] }}</span><span class="pill pill-{{ item.status }}">{{ status_labels[item.status] }}</span></div><div class="request-meta">申请人：<strong>{{ item.applicant.username }}</strong> · {{ item.media.release_year or '年份未知' }} · {{ '电影' if item.media.media_type == 'movie' else '剧集' }}{% if item.season_number %} · 第{{ item.season_number }}季{% endif %}</div>{% if item.user_note %}<div class="request-note"><b>用户备注：</b>{{ item.user_note }}</div>{% endif %}</div>
+  <form action="/admin/requests/{{ item.id }}" method="post" class="request-actions"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><input type="hidden" name="return_to" value="/dashboard"><select class="field-input dashboard-status-select" name="status" aria-label="{{ item.media.title }} 的处理状态">{% for key, label in status_labels.items() %}<option value="{{ key }}" {% if item.status == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="btn btn-primary btn-sm">更新</button><a class="btn btn-secondary btn-sm" href="/admin/requests">详情</a></form>
+</article>{% endfor %}</div>{% else %}<div class="empty-state"><p>暂时没有用户申请。</p></div>{% endif %}
+{% else %}
+<section class="section-heading"><div><span class="eyebrow">最近更新</span><h2>我的申请</h2></div><a href="/requests/recent">查看全部</a></section>
+{% if requests %}<div class="request-list">{% for item in requests %}{% include "partials/request_item.html" %}{% endfor %}</div>{% else %}<div class="empty-state"><p>还没有申请。</p><a class="button button-secondary" href="/search">去搜索想看的内容</a></div>{% endif %}
+{% endif %}
+{% if current_user.is_admin and sync_status and sync_status.next_sync_at %}<script>
+  (() => {
+    const counter = document.getElementById('sync-countdown');
+    if (!counter) return;
+    const target = new Date(counter.dataset.nextSync).getTime();
+    const render = () => {
+      const seconds = Math.max(0, Math.ceil((target - Date.now()) / 1000));
+      const minutes = Math.floor(seconds / 60);
+      counter.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+    };
+    render(); setInterval(render, 1000);
+  })();
+</script>{% endif %}
+{% endblock %}

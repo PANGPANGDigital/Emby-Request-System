@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="topbar-label">Admin</div>
+<div class="topbar-title">用户管理</div>
+<div class="topbar-sub">创建和管理普通用户账号。</div>
+{% endblock %}
+{% block content %}
+<section class="section-heading">
+  <div>
+    <span class="eyebrow">管理员</span>
+    <h1>用户管理</h1>
+    <p>普通用户由管理员创建，不开放公开注册。</p>
+  </div>
+</section>
+<div class="admin-two-col">
+  <form class="settings-card" action="/admin/users" method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="settings-card-title">创建普通用户</div>
+    <div class="settings-card-desc">填写账号信息后即可创建</div>
+    <div class="field">
+      <label class="field-label">账号</label>
+      <input class="field-input" name="username" minlength="3" required placeholder="至少 3 位">
+    </div>
+    <div class="field">
+      <label class="field-label">初始密码</label>
+      <input class="field-input" name="password" type="password" minlength="5" required placeholder="至少 5 位">
+    </div>
+    <button class="btn btn-primary">创建用户</button>
+  </form>
+  <section class="settings-card user-list-card">
+    <div class="user-list-header">已有用户</div>
+    <div class="user-list">
+      {% for user in users %}
+      <div class="user-row">
+        <div class="user-info">
+          <strong>{{ user.username }}</strong>
+          <p>{{ '管理员' if user.is_admin else '普通用户' }} · {{ '已启用' if user.is_active else '已停用' }}</p>
+        </div>
+        {% if not user.is_admin %}
+        <div class="user-actions">
+          <form action="/admin/users/{{ user.id }}/toggle" method="post">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <button class="btn btn-secondary">{{ '停用' if user.is_active else '启用' }}</button>
+          </form>
+          <form action="/admin/users/{{ user.id }}/delete" method="post" onsubmit="return confirm('确定要删除用户 {{ user.username }} 及其所有申请记录吗？')">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <button class="btn btn-danger">删除</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="topbar-label">My Requests</div>
+<div class="topbar-title">求片广场</div>
+<div class="topbar-sub">我的求片与追新申请。</div>
+{% endblock %}
+{% block content %}<section class="section-heading"><div><span class="eyebrow">最近申请</span><h1>求片与追新</h1><p>所有用户提交的最新求片和追新申请。</p></div><a class="button button-primary" href="/search">新建申请</a></section>
+<div class="request-list">{% for item in requests %}
+<article class="request-item">
+  {% if item.media.poster_path %}<img class="request-poster" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">{% else %}<div class="request-poster-placeholder">无海报</div>{% endif %}
+  <div class="request-body"><div class="request-title-row"><div class="request-title">{{ item.media.title }}</div><span class="pill pill-{{ item.request_type }}">{{ type_labels[item.request_type] }}</span></div>
+    <div class="request-meta">申请人：<strong>{{ item.applicant.username }}</strong> · {{ item.media.release_year or '年份未知' }} · {{ '电影' if item.media.media_type == 'movie' else '剧集' }}{% if item.season_number %} · 第{{ item.season_number }}季{% endif %}</div>
+    {% if item.user_note %}<div class="request-note"><b>备注：</b>{{ item.user_note }}</div>{% endif %}
+    {% if item.admin_note %}<div class="request-note admin-note"><b>处理备注：</b>{{ item.admin_note }}</div>{% endif %}
+  </div>
+  <div class="request-footer"><span class="pill pill-{{ item.status }}">{{ status_labels[item.status] }}</span><time class="request-time">{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</time></div>
+</article>{% else %}<div class="empty-state"><p>暂无申请记录。</p></div>{% endfor %}</div>{% endblock %}

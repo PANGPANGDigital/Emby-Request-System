@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="topbar-label">Admin</div>
+<div class="topbar-title">站点配置</div>
+<div class="topbar-sub">管理服务连接、通知和同步设置。</div>
+{% endblock %}
+{% block content %}
+<section class="section-heading"><div><span class="eyebrow">管理员</span><h1>基础配置</h1><p>修改服务连接凭据后，可立即手动同步片库。</p></div></section>
+<div class="settings-grid">
+<section class="settings-card"><div class="settings-card-header"><div class="settings-card-title-group"><div class="settings-card-title">服务连接</div><div class="settings-card-desc">连接 Emby 媒体服务器与 TMDB 数据库</div></div><span class="status-badge {{ 'configured' if emby_configured and tmdb_configured else 'pending' }}">{{ '已配置' if emby_configured and tmdb_configured else '未配置' }}</span></div><form action="/admin/settings" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><div class="field"><label class="field-label">Emby 服务地址</label><input class="field-input" name="emby_url" type="url" required value="{{ emby_url }}"><div class="field-hint">输入 Emby 服务器的完整地址</div></div><div class="field"><label class="field-label">Emby API Key</label><input class="field-input" name="emby_api_key" type="password" placeholder="{{ '已配置；留空保持不变' if emby_configured else '尚未配置' }}"></div><div class="field"><label class="field-label">TMDB API Key</label><input class="field-input" name="tmdb_api_key" type="password" placeholder="{{ '已配置；留空保持不变' if tmdb_configured else '尚未配置' }}"></div><button class="btn btn-primary">保存配置</button></form></section>
+
+<section class="settings-card"><div class="settings-card-header"><div class="settings-card-title-group"><div class="settings-card-title">站点 Logo</div><div class="settings-card-desc">上传一张图片作为站点 Logo</div></div></div>{% if logo_exists %}<img class="logo-preview" src="/static/uploads/logo.png" alt="Logo">{% endif %}<form action="/admin/settings/logo" method="post" enctype="multipart/form-data"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><div class="field"><label class="field-label">选择图片</label><input class="field-input" name="file" type="file" accept="image/*" required><div class="field-hint">建议尺寸 64×64 或更大，支持 PNG / JPG / SVG</div></div><button class="btn btn-primary" type="submit">上传 Logo</button></form></section>
+
+<section class="settings-card"><div class="settings-card-header"><div class="settings-card-title-group"><div class="settings-card-title">Telegram 通知</div><div class="settings-card-desc">新申请提交时通过 Bot 推送通知</div></div><span class="status-badge {{ 'configured' if telegram_configured else 'pending' }}">{{ '已配置' if telegram_configured else '未配置' }}</span></div><p class="field-hint" style="margin-bottom:14px;">在 Telegram 中向 <code>@BotFather</code> 创建 Bot 获取 Token，然后将 Bot 拉入群聊/对话获取 Chat ID。</p><form action="/admin/settings" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><input type="hidden" name="emby_url" value="{{ emby_url }}"><div class="field"><label class="field-label">Bot Token</label><input class="field-input" name="telegram_bot_token" type="password" placeholder="{{ '已配置；留空保持不变' if telegram_configured else '例如 123456:ABC-DEF1234' }}"></div><div class="field"><label class="field-label">接收通知的 Chat ID</label><input class="field-input" name="telegram_chat_id" value="{{ telegram_chat_id }}" placeholder="例如 -1001234567890 或 123456789"></div><button class="btn btn-primary">保存配置</button></form>{% if telegram_configured %}<form class="test-telegram-form" action="/admin/settings/test-telegram" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn btn-secondary">发送测试消息</button></form>{% endif %}</section>
+
+<section class="settings-card sync-card"><div class="settings-card-header"><div class="settings-card-title-group"><div class="settings-card-title">Emby 片库同步</div><div class="settings-card-desc">同步电影和剧集的 TMDB ID，用于在搜索结果中识别“库内已有”。</div></div><div class="sync-library-counts"><span>电影 <b>{{ sync_status.movie_count if sync_status.movie_count is not none else '—' }}</b></span><span>剧集 <b>{{ sync_status.tv_count if sync_status.tv_count is not none else '—' }}</b></span></div></div><p class="field-hint">首次手动同步成功后，系统会每 30 分钟自动同步一次。</p>
+{% if sync_status.next_sync_at %}<div class="sync-status"><div><span class="sync-dot"></span><strong>自动同步已开启</strong></div><span>距下次同步 <b id="sync-countdown" data-next-sync="{{ sync_status.next_sync_at.isoformat() }}">计算中…</b></span></div><div class="sync-details">{% if sync_status.last_sync_at %}<div><span>上次同步</span><strong>{{ sync_status.last_sync_at.strftime('%Y-%m-%d %H:%M') }} 北京时间</strong></div>{% endif %}<div><span>同步间隔</span><strong>30 分钟</strong></div><div><span>下次同步</span><strong>{{ sync_status.next_sync_at.strftime('%Y-%m-%d %H:%M') }} 北京时间</strong></div></div>{% else %}<div class="sync-status sync-status-pending"><div><span class="sync-dot"></span><strong>等待首次手动同步</strong></div><span>完成后将自动开始 30 分钟同步周期</span></div>{% endif %}
+<form action="/admin/settings/sync" method="post"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><button class="btn btn-primary" {% if not emby_configured %}disabled{% endif %}>立即同步 Emby</button></form></section>
+</div>
+{% if sync_status.next_sync_at %}<script>
+  (() => {
+    const counter = document.getElementById('sync-countdown');
+    if (!counter) return;
+    const target = new Date(counter.dataset.nextSync).getTime();
+    const render = () => {
+      const seconds = Math.max(0, Math.ceil((target - Date.now()) / 1000));
+      const minutes = Math.floor(seconds / 60);
+      counter.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+    };
+    render(); setInterval(render, 1000);
+  })();
+</script>{% endif %}
+{% endblock %}

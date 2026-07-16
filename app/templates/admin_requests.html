@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="topbar-label">Admin</div>
+<div class="topbar-title">处理记录</div>
+<div class="topbar-sub">查看申请人信息，并更新求片和追新的处理进度。</div>
+{% endblock %}
+{% block content %}
+<section class="section-heading"><div><span class="eyebrow">管理员</span><h1>申请处理中心</h1><p>查看申请人信息，并更新求片和追新的处理进度。</p></div></section>
+<form class="filter-bar" method="get"><select class="filter-select" name="status" aria-label="状态筛选"><option value="">所有状态</option>{% for key, label in status_labels.items() %}<option value="{{ key }}" {% if active_status == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><select class="filter-select" name="kind" aria-label="类型筛选"><option value="">全部类型</option>{% for key, label in type_labels.items() %}<option value="{{ key }}" {% if active_kind == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="btn btn-secondary">筛选</button></form>
+<p class="list-summary">共 {{ total_requests }} 条申请，每页显示 10 条。</p>
+<div class="admin-request-list">{% for item in requests %}<article class="admin-request-card">
+    <div class="admin-request-header">
+      {% if item.media.poster_path %}<img class="admin-poster" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">{% else %}<div class="admin-poster-placeholder">无海报</div>{% endif %}
+      <div class="admin-request-info">
+        <div class="admin-request-title-row"><div class="admin-request-title">{{ item.media.title }}</div><span class="pill pill-{{ item.request_type }}">{{ type_labels[item.request_type] }}</span><span class="pill pill-{{ item.status }}">{{ status_labels[item.status] }}</span></div>
+        <div class="admin-request-meta">
+          申请人：<strong>{{ item.applicant.username }}</strong> ·
+          {{ item.created_at.strftime('%Y-%m-%d %H:%M') }} ·
+          <a href="https://www.themoviedb.org/{{ item.media.media_type }}/{{ item.media.tmdb_id }}" target="_blank" rel="noopener" class="tmdb-link">TMDB ↗</a>
+          {% if item.media.media_type == 'tv' %} · 剧集{% endif %}
+          {% if item.season_number %} · 第{{ item.season_number }}季{% endif %}
+        </div>
+        {% if item.user_note %}<div class="admin-request-note"><b>用户备注：</b>{{ item.user_note }}</div>{% endif %}
+      </div>
+    </div>
+  <form action="/admin/requests/{{ item.id }}" method="post" class="admin-update-form"><input type="hidden" name="_csrf" value="{{ csrf_token }}"><input type="hidden" name="return_to" value="{{ return_to }}"><select class="field-input" name="status" aria-label="{{ item.media.title }} 的处理状态">{% for key, label in status_labels.items() %}<option value="{{ key }}" {% if item.status == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><input class="field-input" name="admin_note" value="{{ item.admin_note or '' }}" placeholder="给申请人的处理备注"><button class="btn btn-primary">保存</button></form>
+</article>{% else %}<div class="empty-state"><p>没有符合条件的申请。</p></div>{% endfor %}</div>
+{% if total_pages > 1 %}
+<nav class="pagination" aria-label="处理中心分页">
+  {% if page_number > 1 %}<a class="pagination-link" href="/admin/requests?{% if query_prefix %}{{ query_prefix }}&amp;{% endif %}page={{ page_number - 1 }}">上一页</a>{% else %}<span class="pagination-link is-disabled">上一页</span>{% endif %}
+  <span class="pagination-current">第 {{ page_number }} / {{ total_pages }} 页</span>
+  {% if page_number < total_pages %}<a class="pagination-link" href="/admin/requests?{% if query_prefix %}{{ query_prefix }}&amp;{% endif %}page={{ page_number + 1 }}">下一页</a>{% else %}<span class="pagination-link is-disabled">下一页</span>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}
