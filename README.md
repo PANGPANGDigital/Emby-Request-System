@@ -49,7 +49,17 @@ Emby Server API ── 片库与季信息 ── 手动首次同步，随后每 
 
 发布包包含 [最终版交互原型](prototype-ui-v6.html)。这是用于展示界面设计的静态 HTML 文件，不连接真实服务，也不包含任何账号、密钥或私有地址；下载后可直接用浏览器打开查看。
 
-另外，`docs/prototypes/images/` 收录了以下页面原型导出的 PNG 图片，便于在 GitHub 中直接预览：登录、初始化设置、工作台、资源搜索、最近申请、处理中心、用户管理和站点配置。图片仅使用演示内容，不含真实服务配置或凭据。
+以下为已上传至 GitHub 的页面原型预览图。图片仅使用演示内容，不含真实服务配置或凭据。
+
+| 登录 | 初始化设置 |
+| --- | --- |
+| ![登录页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/login.png) | ![初始化设置页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/setup-redesign.png) |
+| 工作台 | 资源搜索 |
+| ![工作台原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/dashboard.png) | ![资源搜索页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/search.png) |
+| 最近申请 | 处理中心 |
+| ![最近申请页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/recent_requests.png) | ![处理中心原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/admin_requests.png) |
+| 用户管理 | 站点配置 |
+| ![用户管理页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/admin_users.png) | ![站点配置页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/admin_settings.png) |
 
 ## 部署前准备
 
