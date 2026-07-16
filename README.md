@@ -55,6 +55,7 @@ Emby Server API ── 片库与季信息 ── 手动首次同步，随后每 
 | --- | --- |
 | ![登录页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/login.png) | ![初始化设置页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/setup-redesign.png) |
 | 工作台 | 用户管理 |
+| --- | --- |
 | ![工作台原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/dashboard.png) | ![用户管理页原型](https://raw.githubusercontent.com/PANGPANGDigital/Emby-Request-System/main/docs/prototypes/images/admin_users.png) |
 
 ## 部署前准备
