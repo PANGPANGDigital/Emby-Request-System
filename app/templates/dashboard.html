@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block page_header %}{% endblock %}
+{% block content %}
+{% set sync_percent = 100 if sync_status and sync_status.last_sync_at else 0 %}
+{% set sync_ready = sync_status and sync_status.last_sync_at %}
+<div class="dashboard-page">
+  <div class="page-head">
+    <div>
+      <div class="eyebrow">Emby Request · Overview</div>
+      <h1>工作台</h1>
+      <p class="page-sub">把想看的电影，交给片库来记住。</p>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/requests/recent">查看我的申请</a>
+      <a class="btn btn-primary" href="/search">搜索内容</a>
+    </div>
+  </div>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">你的私人求片档案</div>
+      <div class="hero-title">从搜索、求片到入库，所有进度都在这一张电影工作台里。</div>
+      <p>保留现有的求片、追新和管理员处理流程，借助更清晰的影片状态，让每一次申请都有去处、有回应。</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/search">去搜索内容</a>
+        <a class="btn" href="/requests/recent">查看求片广场</a>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="hero-side-head">
+        <span class="hero-side-label">本月片库同步</span>
+        <span class="status-chip {{ 'green' if sync_ready else 'gold' }}"><i class="dot"></i>{{ '正常' if sync_ready else '等待同步' }}</span>
+      </div>
+      <div class="hero-score"><strong>{{ sync_percent }}%</strong><span>Emby 已完成同步</span></div>
+      <div class="meter"><span style="width: {{ sync_percent }}%"></span></div>
+      <div class="hero-side-foot">
+        <span>{% if sync_status and sync_status.last_sync_at %}上次同步 {{ sync_status.last_sync_at | beijing_strftime('%m-%d %H:%M') }}{% else %}尚未完成首次同步{% endif %}</span>
+        <span>{{ '自动同步开启' if sync_status and sync_status.next_sync_at else '等待手动同步' }}</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat highlight"><div class="stat-label">电影</div><div class="stat-value">{{ stats.movie_count if stats and stats.movie_count is not none else '—' }}</div><div class="stat-sub">已同步到片库</div></div>
+    <div class="stat"><div class="stat-label">剧集</div><div class="stat-value">{{ stats.tv_count if stats and stats.tv_count is not none else '—' }}</div><div class="stat-sub">已同步到片库</div></div>
+    <div class="stat"><div class="stat-label">待处理申请</div><div class="stat-value">{{ stats.pending_count if stats else requests|length }}</div><div class="stat-sub">求片 + 追新</div></div>
+    <div class="stat"><div class="stat-label">已入库</div><div class="stat-value">{{ stats.completed_count if stats else '—' }}</div><div class="stat-sub">累计完成</div></div>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="panel">
+      <div class="panel-head">
+        <div><div class="panel-title">最新申请</div><div class="panel-sub">最近提交的求片与追新申请</div></div>
+        <a class="section-link" href="{{ '/admin/requests' if current_user.is_admin else '/requests/recent' }}">查看全部 →</a>
+      </div>
+      {% if requests %}
+      <div class="request-list">
+        {% for item in requests %}
+        <article class="request">
+          {% if item.media.poster_path %}
+          <img class="poster poster-image" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">
+          {% else %}
+          <div class="poster {{ loop.cycle('red', 'blue', 'teal', 'violet') }}"><span class="poster-text">{{ item.media.title }}</span></div>
+          {% endif %}
+          <div class="request-main">
+            <div class="request-title">
+              <strong>{{ item.media.title }}</strong>
+              <span class="status-chip {{ 'rust' if item.request_type == 'request' else 'gold' }}">{{ type_labels[item.request_type] }}</span>
+              <span class="status-chip {% if item.status == 'completed' %}green{% elif item.status == 'processing' %}gold{% elif item.status == 'paused' %}rust{% elif item.status == 'test' %}gray{% else %}blue{% endif %}">{{ status_labels[item.status] }}</span>
+            </div>
+            <div class="request-meta">
+              {% if current_user.is_admin %}申请人：{{ item.applicant.username }} · {% endif %}{{ item.media.release_year or '年份未知' }} · {{ '电影' if item.media.media_type == 'movie' else '剧集' }}{% if item.season_number %} · 第 {{ item.season_number }} 季{% endif %}{% if current_user.is_admin %} · <a class="tmdb-link" href="https://www.themoviedb.org/{{ item.media.media_type }}/{{ item.media.tmdb_id }}" target="_blank" rel="noreferrer">TMDB ↗</a>{% endif %}
+            </div>
+            {% if item.user_note %}<span class="request-note">用户备注：{{ item.user_note }}</span>{% endif %}
+          </div>
+          <div class="request-actions"><a class="btn" href="{{ '/admin/requests' if current_user.is_admin else '/requests/recent' }}">详情</a></div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state dashboard-empty"><p>{{ '暂时没有用户申请。' if current_user.is_admin else '还没有申请。' }}</p><a class="btn btn-secondary" href="/search">去搜索想看的内容</a></div>
+      {% endif %}
+    </section>
+
+    <div class="side-stack">
+      <section class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">服务状态</div><div class="panel-sub">连接状态一目了然</div></div>
+          <span class="status-chip {{ 'green' if service_online_count == 3 else 'gold' }}"><i class="dot"></i>{{ '在线' if service_online_count == 3 else '部分在线' }}</span>
+        </div>
+        <div class="service-list">
+          <div class="service"><span class="service-left"><i class="dot {{ 'on' if configured and configured.tmdb_api_key else 'off' }}"></i>TMDB 搜索服务</span><span class="service-state">{{ '已配置' if configured and configured.tmdb_api_key else '未配置' }}</span></div>
+          <div class="service"><span class="service-left"><i class="dot {{ 'on' if configured and configured.emby_url and configured.emby_api_key else 'off' }}"></i>Emby 媒体服务器</span><span class="service-state">{{ '已配置' if configured and configured.emby_url and configured.emby_api_key else '未配置' }}</span></div>
+          <div class="service"><span class="service-left"><i class="dot {{ 'on' if configured and configured.feishu_webhook_url else 'off' }}"></i>飞书通知</span><span class="service-state">{{ '已配置' if configured and configured.feishu_webhook_url else '未配置' }}</span></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><div class="panel-title">片库同步</div><div class="panel-sub">Emby 自动同步进度</div></div></div>
+        <div class="sync-box">
+          <div class="sync-top"><span>{{ '自动同步已开启' if sync_status and sync_status.next_sync_at else '等待首次同步' }}</span><span>{{ sync_percent }}%</span></div>
+          <div class="meter"><span style="width: {{ sync_percent }}%"></span></div>
+          <div class="sync-meta"><span>{% if sync_status and sync_status.last_sync_at %}最近同步 {{ sync_status.last_sync_at | beijing_strftime('%m-%d %H:%M') }}{% else %}尚未同步{% endif %}</span><span>{% if sync_status and sync_status.next_sync_at %}下次同步 {{ (sync_status.remaining_seconds // 60) + (1 if sync_status.remaining_seconds % 60 else 0) }} 分钟后{% else %}完成手动同步后开启{% endif %}</span></div>
+        </div>
+        <div class="attention"><strong>还有 {{ stats.pending_count if stats else requests|length }} 条申请待处理</strong><span>进入处理中心，统一更新状态并留下处理备注。</span></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="section-head"><div><h2>片库掠影</h2><p>用海报快速浏览最近入库内容</p></div></div>
+  {% if library_media %}
+  <div class="shelf">
+    {% for item in library_media %}
+    <div class="film-card">
+      <div class="film-cover {% if not item.poster_path %}{{ loop.cycle('cover-a', 'cover-b', 'cover-c', 'cover-d', 'cover-e', 'cover-f') }}{% endif %}">
+        {% if item.poster_path %}<img src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}" alt="{{ item.title }} 海报" loading="lazy">{% else %}<img src="/media/{{ item.id }}/poster" alt="{{ item.title }} 海报" loading="lazy" onerror="this.style.display='none'">{% endif %}
+        <i></i><span>{{ item.title }}</span>
+      </div>
+      <div class="film-title">{{ item.title }}</div><div class="film-meta">{{ item.release_year or '年份未知' }} · 已入库</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state dashboard-empty"><p>完成 Emby 片库同步后，这里会显示最近入库内容。</p><a class="btn btn-secondary" href="/admin/settings">去同步片库</a></div>
+  {% endif %}
+</div>
+{% endblock %}

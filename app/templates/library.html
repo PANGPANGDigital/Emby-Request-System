@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}片库掠影 · Emby Request{% endblock %}
+{% block page_header %}{% endblock %}
+{% block content %}
+<div class="library-page">
+  <section class="library-page-head">
+    <div class="eyebrow">Emby Library · Latest</div>
+    <h1>片库掠影</h1>
+    <p>按最近入库时间展示最新 10 个资源，重复内容自动合并。</p>
+  </section>
+  {% if library_media %}
+  <section class="library-wall" aria-label="最近入库内容">
+    {% for item in library_media %}
+    <article class="library-wall-card">
+      <div class="library-wall-cover {% if not item.poster_path %}{{ loop.cycle('cover-a', 'cover-b', 'cover-c', 'cover-d', 'cover-e', 'cover-f') }}{% endif %}">
+        {% if item.poster_path %}<img src="https://image.tmdb.org/t/p/w342{{ item.poster_path }}" alt="{{ item.title }} 海报" loading="lazy">{% else %}<img src="/media/{{ item.id }}/poster" alt="{{ item.title }} 海报" loading="lazy" onerror="this.style.display='none'">{% endif %}
+        <span>{{ item.title }}</span>
+      </div>
+      <div class="library-wall-title">{{ item.title }}</div>
+      <div class="library-wall-meta">{{ item.release_year or '年份未知' }} · 已入库</div>
+    </article>
+    {% endfor %}
+  </section>
+  {% else %}
+  <div class="empty-state library-empty"><p>片库同步完成后，这里会显示最近入库内容。</p></div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Emby Request Logo</title>
+  <desc id="desc">结合电影胶片、搜索与新增标记的媒体请求图标</desc>
+  <rect width="128" height="128" rx="30" fill="#9A3412"/>
+  <g transform="translate(7.5 0)">
+    <path d="M35 29h43c9 0 16 7 16 16v38c0 9-7 16-16 16H35c-9 0-16-7-16-16V45c0-9 7-16 16-16Z" fill="#FFFDF8"/>
+    <path d="M19 50h75M19 78h75" fill="none" stroke="#9A3412" stroke-width="6" opacity=".9"/>
+    <circle cx="31" cy="39.5" r="4" fill="#9A3412"/>
+    <circle cx="82" cy="39.5" r="4" fill="#9A3412"/>
+    <circle cx="31" cy="88.5" r="4" fill="#9A3412"/>
+    <circle cx="82" cy="88.5" r="4" fill="#9A3412"/>
+    <path d="M46 58.5h21.5a10.5 10.5 0 0 1 0 21H46a10.5 10.5 0 0 1 0-21Z" fill="none" stroke="#9A3412" stroke-width="6"/>
+    <path d="m64 72 11 11" fill="none" stroke="#9A3412" stroke-width="6" stroke-linecap="round"/>
+    <path d="M86 58v13M79.5 64.5h13" fill="none" stroke="#9A3412" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      # 使用 SQLite 作为数据库，数据文件持久化到宿主机路径
+      DATABASE_URL: sqlite:////app/config/emby_requests.db
+      # 是否启用安全 Cookie（生产环境如使用 HTTPS 建议改为 true）
+      COOKIE_SECURE: "false"
+      # HTTP/HTTPS 代理地址，用于访问 TMDB API
+      # 留空则不使用代理。示例：HTTP_PROXY: "http://127.0.0.1:7890"
+      HTTP_PROXY: ""
+      HTTPS_PROXY: ""
+    volumes:
+      # 使用相对路径，自动绑定到 compose.yaml 所在的群晖项目目录
+      - ./config:/app/config
+      - ./config/secrets:/app/secrets
+      # 上传文件（如站点 Logo）持久化
+      - ./config/uploads:/app/static/uploads
