@@ -1,1 +1,0 @@
-"""Emby media request application."""
