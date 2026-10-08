@@ -1,56 +1,65 @@
-# Emby 求片中心
+<p align="center">
+  <img src="app/static/logo.svg" alt="Emby 求片中心 Logo" width="112">
+</p>
 
-面向个人媒体库和小型 Emby 社群的媒体请求管理系统。用户可以搜索电影和剧集、提交求片或追新申请、查看申请进度；管理员可以同步 Emby 片库、管理用户和处理申请，并通过飞书接收新申请通知。
+<h1 align="center">Emby 求片中心</h1>
 
-## v11 界面展示
+<p align="center">
+  面向个人媒体库与小型 Emby 社群的媒体请求管理系统
+</p>
 
-以下图片由已测试通过的 v11 应用页面直接生成，展示了当前模板和布局。图片中的账号、片目数据、服务状态、统计数字和配置值均为演示内容；未使用真实用户数据、API Key、Webhook 或私有服务地址。
+<p align="center">
+  <img src="https://img.shields.io/badge/UI-v11-9A3412?style=flat-square" alt="已测试界面 v11">
+  <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker Compose">
+  <img src="https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.13">
+</p>
 
-### 管理员工作台
+<p align="center">
+  <a href="#项目亮点">项目亮点</a> ·
+  <a href="#界面预览">界面预览</a> ·
+  <a href="#快速部署">快速部署</a> ·
+  <a href="#数据与备份">数据与备份</a>
+</p>
 
-![v11 管理员工作台](docs/screenshots/dashboard.png)
+---
 
-### 普通用户片库掠影
+用户可以搜索电影和剧集、提交求片或追新申请、跟踪处理进度；管理员可以同步 Emby 片库、管理用户和处理申请，并通过飞书接收新申请通知。系统支持 Docker 部署，适用于群晖等 NAS。
 
-![v11 普通用户片库掠影](docs/screenshots/library.png)
+## 项目亮点
 
-### 资源搜索
+- **资源发现**：通过 TMDB 搜索电影和剧集，并结合 Emby 同步结果显示片库状态。
+- **完整申请流程**：电影可直接求片；剧集求片和追新均可在弹窗中选择季数。
+- **面向不同角色的界面**：普通用户使用“片库掠影 / 资源搜索 / 求片广场”；管理员另有工作台、申请处理和站点配置。
+- **最新入库片库**：普通用户片库掠影展示最新入库的最多 10 个资源，并按 TMDB ID 与媒体类型去重。
+- **片库与申请管理**：管理员可同步 Emby、处理申请、添加备注、管理普通用户；“测试数据”状态以灰色标签显示。
+- **飞书通知**：新申请可通过飞书机器人通知，支持签名校验和测试消息；不包含 Telegram 通知。
+- **持久化与安全**：数据库、密钥和站点 Logo 由 Docker Compose 持久化；服务凭据加密后保存。
+- **响应式页面**：适配桌面和移动设备。
 
-![v11 资源搜索页面](docs/screenshots/search.png)
+## 界面预览
 
-### 移动端
+以下为已测试通过的 v11 页面截图。画面中的账号、片目、状态和配置均为演示内容，不含真实用户数据、API Key、Webhook 或私有服务地址。
 
-<img src="docs/screenshots/mobile.png" alt="v11 普通用户移动端页面" width="390">
+<table>
+  <tr>
+    <td align="center" width="50%"><strong>管理员工作台</strong><br><img src="docs/screenshots/dashboard.png" alt="管理员工作台 v11" width="100%"></td>
+    <td align="center" width="50%"><strong>普通用户片库掠影</strong><br><img src="docs/screenshots/library.png" alt="普通用户片库掠影 v11" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><strong>资源搜索</strong><br><img src="docs/screenshots/search.png" alt="资源搜索 v11" width="100%"></td>
+    <td align="center" width="50%"><strong>初始化配置</strong><br><img src="docs/screenshots/setup.png" alt="初始化配置页面 v11" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><strong>管理员配置</strong><br><img src="docs/screenshots/settings.png" alt="管理员配置页面 v11" width="100%"></td>
+    <td align="center" width="50%"><strong>移动端</strong><br><img src="docs/screenshots/mobile.png" alt="普通用户移动端页面 v11" width="42%"></td>
+  </tr>
+</table>
 
-### 管理员配置
-
-![v11 管理员配置页面](docs/screenshots/settings.png)
-
-### 初始化页面
-
-![v11 初始化配置页面](docs/screenshots/setup.png)
-
-> 公开发布截图使用演示账号和示例数据。海报由 TMDB 图片服务提供；因演示条目未配置海报的卡片会显示应用自己的占位样式。
-
-## 功能
-
-- 初始化向导：创建管理员账号并配置 Emby、TMDB。
-- TMDB 中文搜索电影和剧集，显示海报、简介、年份和原始标题。
-- 同步 Emby 电影、剧集及剧集季信息，并在搜索结果标识片库状态。
-- 电影支持求片；剧集求片和追新均通过弹窗选择季数。
-- 普通用户页面顺序为“片库掠影 / 资源搜索 / 求片广场”，不显示管理员工作台。
-- 普通用户片库掠影按最新入库时间展示最多 10 个资源，并按 TMDB ID 与媒体类型去重。
-- 管理员工作台展示申请概览、片库同步状态、服务状态、最新申请和 6 个片库掠影资源。
-- 管理员可筛选、分页处理申请并添加处理备注；状态包括“测试数据”，使用灰色标签显示。
-- 管理员可创建、启用、停用和删除普通用户。
-- 新申请通过飞书机器人通知；支持签名校验和测试消息。Telegram 通知已移除。
-- 管理员可上传站点 Logo；Logo、数据库和密钥通过 Docker Compose 持久化。
-- 首次手动同步成功后，每 30 分钟自动同步 Emby 片库。
-- 页面适配桌面端和移动端。
+> 截图使用演示账号与示例数据。海报由 TMDB 图片服务提供；没有海报的演示条目会显示应用占位样式。
 
 ## 技术栈
 
-| 类别 | 技术 |
+| 模块 | 技术 |
 | --- | --- |
 | 后端 | Python 3.13、FastAPI、Uvicorn |
 | 页面 | Jinja2、原生 CSS、响应式布局 |
@@ -59,9 +68,9 @@
 | 外部服务 | TMDB v3 API、Emby Server API、飞书机器人 Webhook |
 | 部署 | Docker、Docker Compose |
 
-## Docker 部署
+## 快速部署
 
-### 准备
+### 环境准备
 
 - Docker Engine 或 Docker Desktop
 - Docker Compose v2
@@ -69,40 +78,40 @@
 - TMDB v3 API Key
 - 可选：飞书自定义机器人 Webhook 和签名密钥
 
-### 启动
+### 启动服务
 
-在项目根目录运行：
-
-```sh
-docker compose up -d --build
-```
-
-或者运行一键脚本：
+在项目根目录执行：
 
 ```sh
-./start.sh
+ docker compose up -d --build
 ```
 
-应用默认监听 `9521` 端口。群晖上可在 Container Manager 的项目目录中使用此 `compose.yaml`，再访问：
+也可以使用启动脚本：
+
+```sh
+ ./start.sh
+```
+
+应用默认监听 `9521` 端口。群晖可在 Container Manager 中通过项目目录部署，然后访问：
 
 ```text
 http://<NAS 地址>:9521
 ```
 
-Compose 挂载使用相对路径，项目可以放在任意 NAS 目录中，无须修改本机绝对路径。
+Compose 使用相对挂载路径，项目目录可放在 NAS 上任意位置，无需修改本机绝对路径。
 
-### 初始化
+### 首次初始化
 
 1. 首次访问时，创建管理员账号并填写 Emby 地址、Emby API Key 和 TMDB API Key。
 2. 管理员登录后，在“站点配置”中手动同步一次 Emby 片库。
 3. 在“用户管理”中创建普通用户。
-4. 如需通知，在“站点配置 → 飞书通知”中填写 Webhook；开启加签时再填写签名密钥。
+4. 如需通知，在“站点配置 → 飞书通知”填写 Webhook；只有开启加签时才需要填写签名密钥。
 
-Emby、TMDB 和飞书凭据不会写进 Compose 文件。容器首次启动会生成会话密钥和配置加密密钥，服务凭据加密后保存到数据库。
+凭据不会写入 Compose 文件。容器首次启动会生成会话密钥和配置加密密钥；Emby、TMDB 与飞书配置会加密后保存到数据库。首次手动同步成功后，系统每 30 分钟自动同步一次 Emby 片库。
 
-## 数据持久化与备份
+## 数据与备份
 
-Compose 会在项目目录创建 `config/`：
+Compose 会在项目目录创建 `config/` 并保存运行数据：
 
 ```text
 config/
@@ -111,20 +120,24 @@ config/
 └── uploads/
 ```
 
-升级、迁移或重装前，请备份完整的 `config/` 目录。数据库保存账号、申请、媒体索引和加密后的配置；`secrets/` 保存用于会话和解密配置的密钥；`uploads/` 保存站点 Logo。
+升级、迁移或重装前，请备份完整的 `config/` 目录：
 
-如果丢失 `config/secrets/`，数据库中已加密的 Emby、TMDB 和飞书凭据将无法解密，需要重新配置。不要把 `config/` 上传到 GitHub。
+- `emby_requests.db`：账号、申请、媒体索引和加密后的配置。
+- `secrets/`：会话密钥和配置解密密钥。
+- `uploads/`：站点 Logo。
+
+如果丢失 `config/secrets/`，数据库中加密的 Emby、TMDB 和飞书凭据将无法解密，需要重新配置。**不要将 `config/` 上传到 GitHub。**
 
 ## 常用命令
 
 ```sh
-# 查看状态
+# 查看容器状态
 docker compose ps
 
-# 查看日志
+# 查看实时日志
 docker compose logs -f app
 
-# 停止应用，保留 config 数据
+# 停止应用（保留 config 数据）
 docker compose down
 
 # 用当前源码重新构建
@@ -133,14 +146,12 @@ docker compose up -d --build
 
 ## HTTPS 与反向代理
 
-如通过 Nginx、Caddy 或 Traefik 提供 HTTPS，请在确认代理已配置后，将 `compose.yaml` 中 `COOKIE_SECURE` 设为 `"true"`，再重建容器。纯 HTTP 访问时保持 `"false"`，否则浏览器不会发送登录 Cookie。
+使用 Nginx、Caddy 或 Traefik 提供 HTTPS 时，确认代理配置完成后，将 `compose.yaml` 中的 `COOKIE_SECURE` 设为 `"true"` 并重建容器。纯 HTTP 访问时保持 `"false"`，否则浏览器不会发送登录 Cookie。
 
-## GitHub 发布与脱敏
+## 发布安全说明
 
-本发布包排除了数据库、备份、`.env`、密钥目录、上传 Logo、Python 缓存和本地临时文件。Compose 使用相对挂载路径。截图仅含演示账号、示例片目和占位服务地址。
-
-上传仓库前请查看 [GitHub 上传检查清单](GITHUB_UPLOAD_CHECKLIST.md)，并确认没有把本地数据库或 `config/` 加入 Git。版本记录见 [CHANGELOG.md](CHANGELOG.md)。
+公开发布包不包含数据库、备份、`.env`、密钥目录、用户上传 Logo、Python 缓存或本地临时文件。截图只使用演示账号、示例片目和占位服务地址。发布前可参阅 [GitHub 上传检查清单](GITHUB_UPLOAD_CHECKLIST.md)，版本记录见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 许可与数据来源
 
-项目代码未在此发布包中指定开源许可证。使用者应自行确认其部署、媒体数据和服务配置符合相应服务条款及内容授权要求。媒体元数据与海报由 TMDB 提供；Emby 服务器由部署者自行配置。
+当前仓库未指定开源许可证。使用者应自行确认部署、媒体数据和服务配置符合对应服务条款及内容授权要求。媒体元数据与海报由 TMDB 提供；Emby 服务器由部署者自行配置。
