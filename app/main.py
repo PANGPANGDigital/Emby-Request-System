@@ -299,7 +299,7 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse("/library", status_code=303)
     statement = select(MediaRequest).options(joinedload(MediaRequest.media), joinedload(MediaRequest.applicant))
     if user.is_admin:
-        statement = statement.order_by(MediaRequest.created_at.desc()).limit(10)
+        statement = statement.order_by(MediaRequest.created_at.desc()).limit(4)
     else:
         statement = statement.where(MediaRequest.applicant_id == user.id).order_by(MediaRequest.updated_at.desc()).limit(6)
     requests = db.scalars(statement).unique().all()
@@ -576,6 +576,7 @@ def admin_requests(
         page_number=page_number,
         total_pages=total_pages,
         total_requests=total_requests,
+        requests_per_page=ADMIN_REQUESTS_PER_PAGE,
         query_prefix=query_prefix,
         return_to=return_to,
     )

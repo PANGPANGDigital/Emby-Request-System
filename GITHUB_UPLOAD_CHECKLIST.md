@@ -1,6 +1,6 @@
 # GitHub 上传检查清单
 
-发布包基于测试通过的 v11 应用源码。上传到 GitHub 前，可按此清单检查文件范围。
+发布包基于 v12 应用源码。上传到 GitHub 前，可按此清单检查文件范围。
 
 ## 应上传的内容
 
@@ -12,6 +12,7 @@
 ├── Dockerfile
 ├── GITHUB_UPLOAD_CHECKLIST.md
 ├── README.md
+├── V12_NAS_UPGRADE.md
 ├── compose.yaml
 ├── requirements.txt
 ├── start.sh
@@ -45,13 +46,17 @@
 
 ## 上传前检查
 
+在解压后的发布包目录运行。此包没有包含 `.git/` 历史；首次上传时先初始化本地仓库：
+
 ```sh
-git status --short
+git init -b main
 git add .
-git status --short
 git diff --cached --check
 git diff --cached --name-only
+git status --short
 ```
+
+确认清单里只有应用源码、部署文件和演示截图后，再提交并推送到自己的 GitHub 仓库。
 
 核对暂存文件中没有数据库、密钥、上传文件、`.env` 或本机绝对路径。发布截图使用演示账号和示例服务信息；不要将生产数据库截图放入仓库。
 

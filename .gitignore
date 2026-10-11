@@ -1,0 +1,38 @@
+# 私有配置与凭据
+*.pem
+*.key
+*.p12
+*.pfx
+
+# 本地数据库与备份
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+*.backup
+backups/
+
+# 运行期间上传的文件可能包含私有站点 Logo
+app/static/uploads/
+
+# Python 环境与测试缓存
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 操作系统生成的文件
+.DS_Store
+
+# 本地打包产物、临时输出与历史 UI 草稿
+dist/
+output/
+tmp/
+tmp-prototype/
+prototype-ui*.html
+!prototype-ui-v6.html
+# 原型源文件仅保留导出的最终 PNG 预览图
+docs/prototypes/*
+!docs/prototypes/images/
+!docs/prototypes/images/*.png

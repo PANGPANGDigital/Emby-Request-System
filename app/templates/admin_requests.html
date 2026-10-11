@@ -3,8 +3,8 @@
 {% block content %}
 <section class="section-heading"><div><span class="eyebrow">管理员</span><h1>申请处理中心</h1><p>查看申请人信息，并更新求片和追新的处理进度。</p></div></section>
 <form class="filter-bar" method="get"><select class="filter-select" name="status" aria-label="状态筛选"><option value="">所有状态</option>{% for key, label in status_labels.items() %}<option value="{{ key }}" {% if active_status == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><select class="filter-select" name="kind" aria-label="类型筛选"><option value="">全部类型</option>{% for key, label in type_labels.items() %}<option value="{{ key }}" {% if active_kind == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="btn btn-secondary">筛选</button></form>
-<p class="list-summary">共 {{ total_requests }} 条申请，每页显示 10 条。</p>
-<div class="admin-request-list">{% for item in requests %}<article class="admin-request-card">
+<p class="list-summary">共 {{ total_requests }} 条申请，每页显示 {{ requests_per_page }} 条。</p>
+<div class="admin-request-list admin-request-grid">{% for item in requests %}<article class="admin-request-card">
     <div class="admin-request-header">
       {% if item.media.poster_path %}<img class="admin-poster" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">{% else %}<div class="admin-poster-placeholder">无海报</div>{% endif %}
       <div class="admin-request-info">

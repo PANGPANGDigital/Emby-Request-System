@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block page_header %}{% endblock %}
 {% block content %}<section class="section-heading"><div><span class="eyebrow">最近申请</span><h1>求片与追新</h1><p>所有用户提交的最新求片和追新申请。</p></div><a class="button button-primary" href="/search">新建申请</a></section>
-<div class="request-list">{% for item in requests %}
+<div class="request-list plaza-request-grid">{% for item in requests %}
 <article class="request-item">
   {% if item.media.poster_path %}<img class="request-poster" src="https://image.tmdb.org/t/p/w154{{ item.media.poster_path }}" alt="{{ item.media.title }} 海报" loading="lazy">{% else %}<div class="request-poster-placeholder">无海报</div>{% endif %}
   <div class="request-body"><div class="request-title-row"><div class="request-title">{{ item.media.title }}</div><span class="pill pill-{{ item.request_type }}">{{ type_labels[item.request_type] }}</span></div>

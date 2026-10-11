@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/UI-v11-9A3412?style=flat-square" alt="已测试界面 v11">
+  <img src="https://img.shields.io/badge/UI-v12-9A3412?style=flat-square" alt="界面 v12">
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker Compose">
   <img src="https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python 3.13">
 </p>
@@ -38,7 +38,7 @@
 
 ## 界面预览
 
-以下为已测试通过的 v11 页面截图。画面中的账号、片目、状态和配置均为演示内容，不含真实用户数据、API Key、Webhook 或私有服务地址。
+以下为 v11 发布时的参考截图。V12 更新了工作台最新申请和处理中心布局，具体以当前应用页面为准。画面中的账号、片目、状态和配置均为演示内容，不含真实用户数据、API Key、Webhook 或私有服务地址。
 
 <table>
   <tr>
@@ -99,6 +99,16 @@ http://<NAS 地址>:9521
 ```
 
 Compose 使用相对挂载路径，项目目录可放在 NAS 上任意位置，无需修改本机绝对路径。
+
+### 从 V11 升级到 V12
+
+V12 保留原有数据库格式。升级前先备份完整的 `config/` 目录；替换应用文件时保留 NAS 上已有的 `config/`，然后在项目目录执行：
+
+```sh
+docker compose up -d --build
+```
+
+详细步骤见 [V12 NAS 升级说明](V12_NAS_UPGRADE.md)。
 
 ### 首次初始化
 
