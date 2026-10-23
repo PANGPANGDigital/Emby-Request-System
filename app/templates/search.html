@@ -35,7 +35,7 @@
           <input type="hidden" name="overview" value="{{ item.overview }}">
           <input type="hidden" name="poster_path" value="{{ item.poster_path or '' }}">
           <input type="hidden" name="request_type" value="follow">
-            <label>想看的第几季<input name="season_number" type="number" min="1" step="1" required placeholder="例如：第 2 季"></label>
+            <label>想看的第几季（请输入纯数字）<input name="season_number" type="number" min="1" step="1" required placeholder="例如：2"></label>
             <label>补充说明 <span class="optional">（可选）</span><textarea name="user_note" rows="3" maxlength="500" placeholder="例如：已看完上一季，想继续追更新"></textarea></label>
             <div class="dialog-actions"><button class="btn btn-secondary" type="button" data-dialog-close>取消</button><button class="btn btn-primary" type="submit">提交追新申请</button></div>
           </form>
@@ -63,7 +63,7 @@
           <input type="hidden" name="overview" value="{{ item.overview }}">
           <input type="hidden" name="poster_path" value="{{ item.poster_path or '' }}">
           <input type="hidden" name="request_type" value="request">
-            <label>想看的第几季<input name="season_number" type="number" min="1" step="1" required placeholder="例如：第 2 季"></label>
+            <label>想看的第几季（请输入纯数字）<input name="season_number" type="number" min="1" step="1" required placeholder="例如：2"></label>
             <label>补充说明 <span class="optional">（可选）</span><textarea name="user_note" rows="3" maxlength="500" placeholder="例如：希望从第一季开始完整收录"></textarea></label>
             <div class="dialog-actions"><button class="btn btn-secondary" type="button" data-dialog-close>取消</button><button class="btn btn-primary" type="submit">提交求片申请</button></div>
           </form>
